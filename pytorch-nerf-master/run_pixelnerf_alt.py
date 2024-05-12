@@ -102,8 +102,13 @@ class PixelNeRF:
         self.chunk_size = 1024 * 32
 
     def get_coarse_query_points(self, ds, os):
+        print("Shape of ds:", ds.shape)  # Debug: Log shape of ds
+        print("Shape of os:", os.shape)  # Debug: Log shape of os
         u_is_c = torch.rand(*list(ds.shape[:2]) + [self.N_c]).to(ds)
         t_is_c = self.t_i_c_bin_edges + u_is_c * self.t_i_c_gap
+        
+        print("Shape of t_is_c:", t_is_c.shape)  # Debug: Log shape of t_is_c
+
         r_ts_c = os[..., None, :] + t_is_c[..., :, None] * ds[..., None, :]
         return (r_ts_c, t_is_c)
 
@@ -173,6 +178,8 @@ class PixelNeRF:
             ds_batch = ds_flat[chunk_start : chunk_start + self.chunk_size]
             w_is_batch = z_is_flat[chunk_start : chunk_start + self.chunk_size]
             preds = F(r_ts_batch, ds_batch, w_is_batch)
+            print("Shape of preds['c_is']:", preds["c_is"].shape)  # Debug: Log shape of preds["c_is"]
+            print("Shape of preds['sigma_is']:", preds["sigma_is"].shape)  # Debug: Log shape of preds["sigma_is"]
             c_is.append(preds["c_is"])
             sigma_is.append(preds["sigma_is"])
 
